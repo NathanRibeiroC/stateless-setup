@@ -1,30 +1,35 @@
 # setup-stateless
 
-Stateless Ubuntu bootstrap focused on speed and repeatability.
+Stateless Linux bootstrap focused on speed and repeatability.
 
 ## One-liner (run directly from GitHub)
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/NathanRibeiroC/setup-stateless/main/install-ubuntu.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/NathanRibeiroC/setup-stateless/main/install.sh)
 ```
 
-## What it installs
+## Current support
 
-- Core tooling: `curl`, `wget`, `git`, `jq`
-- Build tooling: `build-essential`, `make`, `zip`, `unzip`
-- Dev CLI: `ripgrep`, `fd-find`, `tmux`, `tree`, `zsh`
-- Python basics: `python3`, `python3-pip`, `pipx`
-- Base packages: `ca-certificates`, `gnupg`, `software-properties-common`, `lsb-release`, `xclip`
+- `ubuntu` (implemented)
+- `fedora` (planned)
+- `gentoo` (planned)
+
+## Installers layout
+
+- `install.sh` (distribution dispatcher)
+- `installers/ubuntu.sh` (Ubuntu implementation)
+- `installers/fedora.sh` (future)
+- `installers/gentoo.sh` (future)
 
 ## Local usage
 
 ```bash
-bash install-ubuntu.sh
+bash install.sh
 bash scripts/check.sh
 ```
 
 ## Notes
 
-- Ubuntu only.
+- Only Ubuntu is currently implemented.
 - Run with a user that has `sudo` access.
 - Script is idempotent and safe to re-run.
