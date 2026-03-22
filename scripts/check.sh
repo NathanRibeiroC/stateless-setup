@@ -14,6 +14,7 @@ required_cmds=(
   code
   google-chrome
   bitwarden
+  libreoffice
   snap
 )
 

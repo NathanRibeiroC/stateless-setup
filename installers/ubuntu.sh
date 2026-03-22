@@ -72,6 +72,7 @@ install_packages() {
     python3
     python3-pip
     pipx
+    libreoffice
     snapd
     xclip
   )
