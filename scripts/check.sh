@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-required=(
+required_cmds=(
   git
   curl
   wget
@@ -14,15 +14,31 @@ required=(
   code
   google-chrome
   bitwarden
+  snap
 )
+
+required_snaps=(
+  notion-snap-reborn
+  obsidian
+)
+
 missing=0
 
-for cmd in "${required[@]}"; do
+for cmd in "${required_cmds[@]}"; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
-    echo "Missing: $cmd"
+    echo "Missing command: $cmd"
     missing=1
   else
-    echo "OK: $cmd"
+    echo "OK command: $cmd"
+  fi
+done
+
+for pkg in "${required_snaps[@]}"; do
+  if ! snap list "$pkg" >/dev/null 2>&1; then
+    echo "Missing snap: $pkg"
+    missing=1
+  else
+    echo "OK snap: $pkg"
   fi
 done
 

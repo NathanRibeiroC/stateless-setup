@@ -47,8 +47,8 @@ bash <(curl -fsSL https://raw.githubusercontent.com/NathanRibeiroC/setup-statele
 - Core CLI: `curl`, `wget`, `git`, `jq`, `ripgrep`, `fd-find`, `tmux`, `tree`, `zsh`, `xclip`
 - Build/tooling: `build-essential`, `make`, `zip`, `unzip`
 - Python: `python3`, `python3-pip`, `pipx`
-- Base system packages: `ca-certificates`, `gnupg`, `lsb-release`, `software-properties-common`
-- Desktop apps: `code`, `google-chrome-stable`, `bitwarden`
+- Base system packages: `ca-certificates`, `gnupg`, `lsb-release`, `software-properties-common`, `snapd`
+- Desktop apps: `code`, `google-chrome-stable`, `bitwarden`, `notion-snap-reborn` (snap), `obsidian` (snap)
 
 ## Local usage
 

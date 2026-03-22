@@ -72,6 +72,7 @@ install_packages() {
     python3
     python3-pip
     pipx
+    snapd
     xclip
   )
 
@@ -136,6 +137,12 @@ install_bitwarden() {
   $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y bitwarden
 }
 
+install_snap_apps() {
+  log "Installing Notion and Obsidian via snap..."
+  $SUDO snap install notion-snap-reborn
+  $SUDO snap install obsidian --classic
+}
+
 main() {
   require_cmd apt-get
   require_cmd dpkg
@@ -153,6 +160,7 @@ main() {
   install_vscode
   install_google_chrome
   install_bitwarden
+  install_snap_apps
 
   # Ensure pipx shims are ready for the current user.
   if command -v pipx >/dev/null 2>&1; then
