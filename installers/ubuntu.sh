@@ -54,6 +54,18 @@ apt_update_if_needed() {
   fi
 }
 
+normalize_vscode_repo_entries() {
+  local list_file
+  # Remove legacy VS Code repository definitions to avoid Signed-By conflicts.
+  $SUDO rm -f /etc/apt/sources.list.d/vscode.sources
+  for list_file in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
+    [[ -f "$list_file" ]] || continue
+    if grep -q "packages.microsoft.com/repos/code" "$list_file"; then
+      $SUDO sed -i '\|packages.microsoft.com/repos/code|d' "$list_file"
+    fi
+  done
+}
+
 install_packages() {
   local packages=(
     ca-certificates
@@ -90,20 +102,11 @@ install_vscode() {
   local keyring_file="${keyring_dir}/packages.microsoft.gpg"
   local source_file="/etc/apt/sources.list.d/vscode.list"
   local arch
-  local list_file
 
   arch="$(dpkg --print-architecture)"
 
   log "Configuring Visual Studio Code official repository..."
   $SUDO install -d -m 0755 "$keyring_dir"
-  # Remove legacy VS Code repository definitions to avoid Signed-By conflicts.
-  $SUDO rm -f /etc/apt/sources.list.d/vscode.sources
-  for list_file in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
-    [[ -f "$list_file" ]] || continue
-    if grep -q "packages.microsoft.com/repos/code" "$list_file"; then
-      $SUDO sed -i '\|packages.microsoft.com/repos/code|d' "$list_file"
-    fi
-  done
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | $SUDO tee "$keyring_file" >/dev/null
   $SUDO chmod a+r "$keyring_file"
   echo "deb [arch=${arch} signed-by=${keyring_file}] https://packages.microsoft.com/repos/code stable main" | $SUDO tee "$source_file" >/dev/null
@@ -303,6 +306,7 @@ main() {
   fi
 
   log "Starting Ubuntu stateless setup..."
+  normalize_vscode_repo_entries
   apt_update_if_needed
   install_packages
   install_vscode
