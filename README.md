@@ -67,6 +67,26 @@ bash install.sh
 bash scripts/check.sh
 ```
 
+## Post-install validation
+
+Run the full validation:
+
+```bash
+bash scripts/check.sh
+```
+
+Run install + validation in a single command:
+
+```bash
+bash install.sh && bash scripts/check.sh
+```
+
+Show only failed/missing checks:
+
+```bash
+bash scripts/check.sh 2>&1 | rg "Missing|failed" -i
+```
+
 ## Notes
 
 - Only Ubuntu is currently implemented.
