@@ -27,53 +27,67 @@ required_snaps=(
   obsidian
 )
 
-missing=0
+ok_items=()
+failed_items=()
+
+add_ok() {
+  ok_items+=("$1")
+}
+
+add_failed() {
+  failed_items+=("$1")
+}
 
 for cmd in "${required_cmds[@]}"; do
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    echo "Missing command: $cmd"
-    missing=1
+  if command -v "$cmd" >/dev/null 2>&1; then
+    add_ok "Command: $cmd"
   else
-    echo "OK command: $cmd"
+    add_failed "Command: $cmd"
   fi
 done
 
 if command -v mise >/dev/null 2>&1 || [[ -x "${HOME}/.local/bin/mise" ]]; then
-  echo "OK command: mise"
+  add_ok "Command: mise"
 else
-  echo "Missing command: mise"
-  missing=1
-fi
-
-if command -v jetbrains-toolbox >/dev/null 2>&1 \
-  || [[ -x "${HOME}/.local/bin/jetbrains-toolbox" ]] \
-  || [[ -x "/usr/local/bin/jetbrains-toolbox" ]] \
-  || [[ -x "/opt/jetbrains-toolbox/jetbrains-toolbox" ]]; then
-  echo "OK command: jetbrains-toolbox"
-else
-  echo "Missing command: jetbrains-toolbox"
-  missing=1
+  add_failed "Command: mise"
 fi
 
 for pkg in "${required_snaps[@]}"; do
-  if ! snap list "$pkg" >/dev/null 2>&1; then
-    echo "Missing snap: $pkg"
-    missing=1
+  if snap list "$pkg" >/dev/null 2>&1; then
+    add_ok "Snap: $pkg"
   else
-    echo "OK snap: $pkg"
+    add_failed "Snap: $pkg"
   fi
 done
 
-if [[ ! -d "${HOME}/.config/nvim" ]]; then
-  echo "Missing LazyVim config directory: ${HOME}/.config/nvim"
-  missing=1
+if [[ -d "${HOME}/.config/nvim" ]]; then
+  add_ok "LazyVim config: ${HOME}/.config/nvim"
 else
-  echo "OK LazyVim config directory: ${HOME}/.config/nvim"
+  add_failed "LazyVim config: ${HOME}/.config/nvim"
 fi
 
-if [[ "$missing" -eq 1 ]]; then
-  echo "Validation failed."
-  exit 1
+echo "==== Installed Successfully ===="
+if [[ "${#ok_items[@]}" -eq 0 ]]; then
+  echo "- None"
+else
+  for item in "${ok_items[@]}"; do
+    echo "- ${item}"
+  done
 fi
 
-echo "Validation completed successfully."
+echo
+echo "==== Missing / Failed ===="
+if [[ "${#failed_items[@]}" -eq 0 ]]; then
+  echo "- None"
+  echo
+  echo "Validation completed successfully."
+  exit 0
+fi
+
+for item in "${failed_items[@]}"; do
+  echo "- ${item}"
+done
+
+echo
+echo "Validation failed."
+exit 1

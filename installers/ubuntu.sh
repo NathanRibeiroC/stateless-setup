@@ -237,40 +237,6 @@ fi"
   fi
 }
 
-install_jetbrains_toolbox() {
-  local target_user install_cmd
-
-  target_user="$(get_target_user)"
-  log "Installing JetBrains Toolbox for user ${target_user}..."
-
-  install_cmd="set -euo pipefail; \
-mkdir -p \"\$HOME/.local/opt\" \"\$HOME/.local/bin\"; \
-tmp_dir=\"\$(mktemp -d)\"; \
-trap 'rm -rf \"\$tmp_dir\"' EXIT; \
-metadata=\"\$(curl -fsSL 'https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release')\"; \
-download_url=\"\$(printf '%s' \"\$metadata\" | jq -r '.TBA[0].downloads.linux.link // empty')\"; \
-if [[ -z \"\$download_url\" ]]; then \
-  echo 'Failed to resolve JetBrains Toolbox download URL.'; \
-  exit 1; \
-fi; \
-curl -fL \"\$download_url\" -o \"\$tmp_dir/toolbox.tar.gz\"; \
-tar -xzf \"\$tmp_dir/toolbox.tar.gz\" -C \"\$tmp_dir\"; \
-extracted_dir=\"\$(find \"\$tmp_dir\" -maxdepth 1 -type d -name 'jetbrains-toolbox-*' | head -n 1)\"; \
-if [[ -z \"\$extracted_dir\" ]]; then \
-  echo 'Failed to extract JetBrains Toolbox archive.'; \
-  exit 1; \
-fi; \
-rm -rf \"\$HOME/.local/opt/jetbrains-toolbox\"; \
-mv \"\$extracted_dir\" \"\$HOME/.local/opt/jetbrains-toolbox\"; \
-ln -sf \"\$HOME/.local/opt/jetbrains-toolbox/jetbrains-toolbox\" \"\$HOME/.local/bin/jetbrains-toolbox\""
-
-  if [[ "$target_user" == "root" ]]; then
-    bash -lc "$install_cmd"
-  else
-    $SUDO -u "$target_user" bash -lc "$install_cmd"
-  fi
-}
-
 install_lazyvim() {
   local target_user target_home nvim_config nvim_data backup_suffix
 
@@ -316,7 +282,6 @@ main() {
   install_snap_apps
   install_node
   install_mise
-  install_jetbrains_toolbox
   install_lazyvim
 
   # Ensure pipx shims are ready for the current user.

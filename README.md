@@ -57,7 +57,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/NathanRibeiroC/setup-statele
 - JavaScript/Node: `nvm` + latest `node` and `npm`
 - Runtime manager: `mise` (installed to `~/.local/bin/mise`)
 - Base system packages: `ca-certificates`, `gnupg`, `lsb-release`, `software-properties-common`, `snapd`
-- Desktop apps: `code`, `google-chrome-stable`, `brave-browser`, `bitwarden`, `libreoffice`, `jetbrains-toolbox`, `notion-snap-reborn` (snap), `obsidian` (snap)
+- Desktop apps: `code`, `google-chrome-stable`, `brave-browser`, `bitwarden`, `libreoffice`, `notion-snap-reborn` (snap), `obsidian` (snap)
 - Editor setup: LazyVim starter in `~/.config/nvim` (if no existing Neovim config is present)
 
 ## Local usage
