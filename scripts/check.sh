@@ -11,6 +11,7 @@ required_cmds=(
   zsh
   python3
   pipx
+  rclone
   node
   npm
   nvim

@@ -125,6 +125,7 @@ install_packages() {
     libreoffice
     snapd
     xclip
+    rclone
   )
 
   log "Installing base development tools..."
@@ -426,6 +427,62 @@ EOF
   fi
 }
 
+configure_google_drive_mount() {
+  local target_user target_home local_bin_dir systemd_dir mount_dir launcher_script service_file
+
+  target_user="$(get_target_user)"
+  target_home="$(get_target_home "$target_user")"
+  local_bin_dir="${target_home}/.local/bin"
+  systemd_dir="${target_home}/.config/systemd/user"
+  mount_dir="${target_home}/GoogleDrive"
+  launcher_script="${local_bin_dir}/mount-gdrive"
+  service_file="${systemd_dir}/gdrive-rclone.service"
+
+  log "Configuring Google Drive mount helpers for user ${target_user}..."
+  $SUDO install -d -m 0755 -o "$target_user" -g "$target_user" "$local_bin_dir"
+  $SUDO install -d -m 0755 -o "$target_user" -g "$target_user" "$systemd_dir"
+  $SUDO install -d -m 0755 -o "$target_user" -g "$target_user" "$mount_dir"
+
+  cat <<EOF | write_file_as_target_user "$target_user" "$launcher_script"
+#!/usr/bin/env bash
+set -euo pipefail
+
+RCLONE_BIN="${target_home}/.local/bin/rclone"
+if [[ ! -x "\${RCLONE_BIN}" ]]; then
+  RCLONE_BIN="rclone"
+fi
+
+if ! "\${RCLONE_BIN}" listremotes 2>/dev/null | grep -qx 'gdrive:'; then
+  echo "[gdrive] Remote 'gdrive' not configured yet. Run 'rclone config' first."
+  exit 0
+fi
+
+mkdir -p "${mount_dir}"
+exec "\${RCLONE_BIN}" mount gdrive: "${mount_dir}" --vfs-cache-mode writes
+EOF
+  run_as_target_user "$target_user" "chmod 755 \"${launcher_script}\""
+
+  cat <<EOF | write_file_as_target_user "$target_user" "$service_file"
+[Unit]
+Description=Mount Google Drive at ${mount_dir}
+After=default.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/mkdir -p ${mount_dir}
+ExecStart=${launcher_script}
+ExecStop=/usr/bin/fusermount3 -u ${mount_dir}
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+EOF
+
+  run_as_target_user "$target_user" "systemctl --user daemon-reload"
+  run_as_target_user "$target_user" "systemctl --user enable gdrive-rclone.service"
+}
+
 install_lazyvim() {
   local target_user target_home nvim_config nvim_data backup_suffix
 
@@ -475,6 +532,7 @@ main() {
   install_jetbrains_mono_nerd_font
   configure_starship
   configure_alacritty
+  configure_google_drive_mount
   install_lazyvim
 
   # Ensure pipx shims are ready for the current user.
