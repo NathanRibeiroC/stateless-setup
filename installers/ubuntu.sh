@@ -325,6 +325,25 @@ fi"
   run_as_target_user "$target_user" "$install_cmd"
 }
 
+install_codex_skills() {
+  local target_user target_home repo_root source_dir skills_dir
+
+  target_user="$(get_target_user)"
+  target_home="$(get_target_home "$target_user")"
+  repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  source_dir="${repo_root}/.codex/skills"
+  skills_dir="${target_home}/.codex/skills"
+
+  if [[ ! -d "$source_dir" ]]; then
+    return
+  fi
+
+  log "Installing Codex skills for user ${target_user}..."
+  $SUDO install -d -m 0755 -o "$target_user" -g "$target_user" "$skills_dir"
+  $SUDO cp -R "${source_dir}/." "$skills_dir/"
+  $SUDO chown -R "$target_user:$target_user" "${target_home}/.codex"
+}
+
 install_jetbrains_mono_nerd_font() {
   local target_user target_home font_dir install_cmd
 
@@ -568,6 +587,7 @@ main() {
   install_node
   install_mise
   install_starship
+  install_codex_skills
   install_jetbrains_mono_nerd_font
   configure_starship
   configure_alacritty

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Commit and Push"
+  short_description: "Commit and push using repo rules."
+  default_prompt: "Create a commit and push it following the repository conventions."
